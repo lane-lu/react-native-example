@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    branches:
+      - *
+#  pull_request:
+#    branches:
+#      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    env:
+      CERTIFICATES_P12: ${{ secrets.CERTIFICATES_P12 }}
+      CERTIFICATES_P12_PASSWORD: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+      EMBEDDED_MOBILEPROVISION: ${{ secrets.EMBEDDED_MOBILEPROVISION }}
+      EXPORT_OPTIONS_PLIST: ${{ secrets.EXPORT_OPTIONS_PLIST }}
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      OUTPUT_PATH: 'ios/build'
+      EXPORT_OPTIONS_PLIST_PATH: 'ios/build/ExportOptions.plist'
+    steps:
+      - name: Check Xcode Version
+        run: xcodebuild -version
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        run: |
+          mkdir -p $OUTPUT_PATH && \
+          echo $EXPORT_OPTIONS_PLIST > EXPORT_OPTIONS_PLIST_PATH && \
+          ls -l ios/build && \
+          cat EXPORT_OPTIONS_PLIST_PATH
+
+      - name: Build for iOS
+        run: |
+          xcodebuild -workspace ios/example.xcworkspace \
+          -scheme example \
+          -configuration Release \
+          clean
