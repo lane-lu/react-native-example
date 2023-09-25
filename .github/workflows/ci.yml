@@ -50,6 +50,7 @@ jobs:
       - name: Build for iOS
         run: |
           yarn install && \
+          cd ios && pod install && cd .. && \
           xcodebuild -workspace ios/example.xcworkspace \
             -scheme example \
             -configuration Release \
