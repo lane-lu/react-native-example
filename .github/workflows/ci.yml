@@ -55,6 +55,8 @@ jobs:
           cd ios
           pod install
           cd ..
+          ls -l .
+          ls -l ios
       
       - name: Clean
         run: |
@@ -62,6 +64,7 @@ jobs:
             -scheme example \
             -configuration Release \
             clean
+          ls -l $BUILD_PATH
       
       - name: Archive
         run: |
@@ -77,13 +80,15 @@ jobs:
             MARKETING_VERSION=$PROJECT_VERSION \
             CURRENT_PROJECT_VERSION=$PROJECT_BUILD \
             archive
+          ls -l $BUILD_PATH
       
       - name: Export
         run: |
           xcodebuild -exportArchive \
             -archivePath $BUILD_PATH/example.xcarchive \
             -exportOptionsPlist $EXPORT_OPTIONS_PLIST_PATH \
-            -exportPath $BUILD_PATH && \
+            -exportPath $BUILD_PATH
+          ls -l $BUILD_PATH
       
       - name: Upload
         run: |
@@ -92,3 +97,4 @@ jobs:
             --type ios \
             --username $ICLOUD_USERNAME \
             --password $ICLOUD_PASSWORD
+          ls -l $BUILD_PATH
