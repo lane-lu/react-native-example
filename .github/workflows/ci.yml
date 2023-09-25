@@ -46,21 +46,9 @@ jobs:
           security unlock-keychain -p $KEYCHAIN_PASSWORD `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
           security import $BUILD_PATH/$CERTIFICATES_P12_NAME -P $CERTIFICATES_P12_PASSWORD -A -t cert -f pkcs12 -k `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
           security list-keychain -d user -s `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
-          base64 -i $BUILD_PATH/$EXPORT_OPTIONS_PLIST_NAME
-          base64 -i $BUILD_PATH/$CERTIFICATES_P12_NAME
-          base64 -i $BUILD_PATH/$MOBILE_PROVISION_NAME
           ls -l $BUILD_PATH
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - uses: pCYSl5EDgo/cat@master
-        id: eo
-        with: 
-          path: $BUILD_PATH/$EXPORT_OPTIONS_PLIST_NAME
-      
-      - run: echo $TEXT
-        env:
-          TEXT: ${{ steps.eo.outputs.text }}
-      
       - name: Resolve Dependencies
         run: |
           yarn install
