@@ -16,14 +16,14 @@ jobs:
       BUILD_PATH: ios/build
       CERTIFICATES_P12: ${{ secrets.CERTIFICATES_P12 }}
       CERTIFICATES_P12_PASSWORD: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
-      CERTIFICATES_P12_PATH: $BUILD_PATH/Certificates.p12
+      CERTIFICATES_P12_PATH: ios/build/Certificates.p12
       MOBILE_PROVISION: ${{ secrets.MOBILE_PROVISION }}
       MOBILE_PROVISION_NAME: ${{ secrets.MOBILE_PROVISION_NAME }}
       MOBILE_PROVISION_PATH: ~/Library/MobileDevice/Provisioning\ Profiles/$MOBILE_PROVISION_NAME
       KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-      KEYCHAIN_PATH: $BUILD_PATH/app-signing.keychain-db
+      KEYCHAIN_PATH: ios/build/app-signing.keychain-db
       EXPORT_OPTIONS_PLIST: ${{ secrets.EXPORT_OPTIONS_PLIST }}
-      EXPORT_OPTIONS_PLIST_PATH: $BUILD_PATH/ExportOptions.plist
+      EXPORT_OPTIONS_PLIST_PATH: ios/build/ExportOptions.plist
       ICLOUD_USERNAME: ${{ secrets.ICLOUD_USERNAME }}
       ICLOUD_PASSWORD: ${{ secrets.ICLOUD_PASSWORD }}
     steps:
