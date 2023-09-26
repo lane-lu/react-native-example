@@ -1,0 +1,107 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    env:
+      PROJECT_VERSION: 1.0.0
+      PROJECT_BUILD: 4
+      BUILD_PATH: "ios/build/target"
+      DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
+      DEVELOPMENT_CERTIFICATE_NAME: "DevelopmentCertificate.p12"
+      DEVELOPMENT_CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPMENT_CERTIFICATE_PASSWORD }}
+      DEVELOPMENT_PROFILE_BASE64: ${{ secrets.DEVELOPMENT_PROFILE_BASE64 }}
+      DEVELOPMENT_PROFILE_NAME: "DevelopmentProfile.mobileprovision"
+      DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
+      DISTRIBUTION_CERTIFICATE_NAME: "DistributionCertificate.p12"
+      DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
+      DISTRIBUTION_PROFILE_BASE64: ${{ secrets.DISTRIBUTION_PROFILE_BASE64 }}
+      DISTRIBUTION_PROFILE_NAME: "DistributionProfile.mobileprovision"
+      EXPORT_OPTIONS_PROFILE_BASE64: ${{ secrets.EXPORT_OPTIONS_PROFILE_BASE64 }}
+      EXPORT_OPTIONS_PROFILE_NAME: "ExportOptions.plist"
+      KEYCHAIN_NAME: "app-signing.keychain-db"
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      TESTFLIGHT_USERNAME: ${{ secrets.TESTFLIGHT_USERNAME }}
+      TESTFLIGHT_PASSWORD: ${{ secrets.TESTFLIGHT_PASSWORD }}
+    steps:
+      - name: Check Xcode Version
+        run: xcodebuild -version
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        run: |
+          mkdir -p $BUILD_PATH
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo -n "$DEVELOPMENT_CERTIFICATE_BASE64" | base64 --decode -o $BUILD_PATH/$DEVELOPMENT_CERTIFICATE_NAME
+          echo -n "$DEVELOPMENT_PROFILE_BASE64" | base64 --decode -o $BUILD_PATH/$DEVELOPMENT_PROFILE_NAME
+          echo -n "$DISTRIBUTION_CERTIFICATE_BASE64" | base64 --decode -o $BUILD_PATH/$DISTRIBUTION_CERTIFICATE_NAME
+          echo -n "$DISTRIBUTION_PROFILE_BASE64" | base64 --decode -o $BUILD_PATH/$DISTRIBUTION_PROFILE_NAME
+          echo -n "$EXPORT_OPTIONS_PROFILE_BASE64" | base64 --decode -o $BUILD_PATH/$EXPORT_OPTIONS_PROFILE_NAME
+          cp -f $BUILD_PATH/$DEVELOPMENT_PROFILE_NAME ~/Library/MobileDevice/Provisioning\ Profiles
+          cp -f $BUILD_PATH/$DISTRIBUTION_PROFILE_NAME ~/Library/MobileDevice/Provisioning\ Profiles
+          security create-keychain -p $KEYCHAIN_PASSWORD `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          security set-keychain-settings -lut 21600 `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          security unlock-keychain -p $KEYCHAIN_PASSWORD `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          security import $BUILD_PATH/$DEVELOPMENT_CERTIFICATE_NAME -P $DEVELOPMENT_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          security import $BUILD_PATH/$DISTRIBUTION_CERTIFICATE_NAME -P $DISTRIBUTION_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          security list-keychain -d user -s `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          ls -l $BUILD_PATH
+          ls -l ~/Library/MobileDevice/Provisioning\ Profiles
+
+      - name: Resolve Dependencies
+        run: |
+          yarn install
+          cd ios
+          pod install
+          cd ..
+          ls -l .
+          ls -l ios
+      
+      - name: Clean
+        run: |
+          xcodebuild -workspace ios/example.xcworkspace \
+            -scheme example \
+            -configuration Release \
+            clean
+          ls -l $BUILD_PATH
+      
+      - name: Archive
+        run: |
+          xcodebuild -workspace ios/example.xcworkspace \
+            -scheme "example" \
+            -sdk iphoneos \
+            -configuration Release \
+            -destination generic/platform=iOS \
+            -archivePath $BUILD_PATH/example.xcarchive \
+            ONLY_ACTIVE_ARCH=NO \
+            ENABLE_BITCODE=NO \
+            VALID_ARCHS="arm64 arm64e armv7s" \
+            MARKETING_VERSION=$PROJECT_VERSION \
+            CURRENT_PROJECT_VERSION=$PROJECT_BUILD \
+            archive
+          ls -l $BUILD_PATH
+      
+      - name: Export
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath $BUILD_PATH/example.xcarchive \
+            -exportOptionsPlist $BUILD_PATH/$EXPORT_OPTIONS_PROFILE_NAME \
+            -exportPath $BUILD_PATH/export
+          ls -l $BUILD_PATH/export
+      
+      - name: Upload
+        run: |
+          xcrun altool --upload-app \
+            --file $BUILD_PATH/export/example.ipa \
+            --type ios \
+            --username $TESTFLIGHT_USERNAME \
+            --password $TESTFLIGHT_PASSWORD
