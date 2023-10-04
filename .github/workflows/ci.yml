@@ -49,7 +49,7 @@ jobs:
           echo ${{ env.BUILD_NAME }}
 
       - name: Setup
-        if: $PROJECT_BUILD > "0"
+        if: env.PROJECT_BUILD > "0"
         run: |
           mkdir -p $BUILD_PATH
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
@@ -70,7 +70,7 @@ jobs:
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Resolve Dependencies
-        if: $PROJECT_BUILD > "0"
+        if: env.PROJECT_BUILD > "0"
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           yarn install
@@ -81,7 +81,7 @@ jobs:
           ls -l ios
       
       - name: Clean
-        if: $PROJECT_BUILD > "0"
+        if: env.PROJECT_BUILD > "0"
         run: |
           xcodebuild -workspace ios/example.xcworkspace \
             -scheme example \
@@ -90,7 +90,7 @@ jobs:
           ls -l $BUILD_PATH
       
       - name: Archive
-        if: $PROJECT_BUILD > "0"
+        if: env.PROJECT_BUILD > "0"
         run: |
           xcodebuild -workspace ios/example.xcworkspace \
             -scheme "example" \
@@ -105,7 +105,7 @@ jobs:
           ls -l $BUILD_PATH
       
       - name: Export
-        if: $PROJECT_BUILD > "0"
+        if: env.PROJECT_BUILD > "0"
         run: |
           xcodebuild -exportArchive \
             -archivePath $BUILD_PATH/example.xcarchive \
@@ -114,7 +114,7 @@ jobs:
           ls -l $BUILD_PATH/export
       
       - name: Upload
-        if: $PROJECT_BUILD > "0"
+        if: env.PROJECT_BUILD > "0"
         run: |
           xcrun altool --upload-app \
             --file $BUILD_PATH/export/example.ipa \
