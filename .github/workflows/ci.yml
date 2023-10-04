@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - '*'
-#TODO - 'main'
+      - 'main'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+-build.[0-9]+'
   pull_request:
@@ -15,11 +14,6 @@ jobs:
   build-ios:
     runs-on: macos-latest
     env:
-#      MARKETING_VERSION: "1.0.0"
-#      CURRENT_PROJECT_VERSION: "0"
-#TODO
-      PROJECT_VERSION: "1.0.0"
-      PROJECT_BUILD: "0"
       BUILD_PATH: "ios/build/target"
       DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
       DEVELOPMENT_CERTIFICATE_NAME: "DevelopmentCertificate.p12"
@@ -45,36 +39,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set Version From Tag
+      - name: Distribution Version
         if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
         run: |
           git_ref_name=${GITHUB_REF#refs/*/}
-          echo $git_ref_name
-          version_code=$(echo $git_ref_name | awk '{sub(/.*[v]/,""); sub(/[-].*/,""); print $0}')
-          build_code=$(echo $git_ref_name | awk '{sub(/.*[-build.]/,""); print $0}')
-          echo $version_code
-          echo $build_code
-          echo "MARKETING_VERSION=$version_code" >> $GITHUB_ENV
-          echo "CURRENT_PROJECT_VERSION=$build_code" >> $GITHUB_ENV
-          echo ${{ env.MARKETING_VERSION }}
-          echo ${{ env.CURRENT_PROJECT_VERSION }}
+          version_number=$(echo $git_ref_name | awk '{sub(/.*[v]/,""); sub(/[-].*/,""); print $0}')
+          build_number=$(echo $git_ref_name | awk '{sub(/.*[-build.]/,""); print $0}')
+          echo "MARKETING_VERSION=$version_number" >> $GITHUB_ENV
+          echo "CURRENT_PROJECT_VERSION=$build_number" >> $GITHUB_ENV
 
-      - name: Set Version
+      - name: Development Version
         if: github.event_name != 'push' || !contains(github.ref, 'refs/tags/')
         run: |
           echo "MARKETING_VERSION=1.0.0" >> $GITHUB_ENV
-          echo "CURRENT_PROJECT_VERSION=0" >> $GITHUB_ENV
-          echo ${{ env.MARKETING_VERSION }}
-          echo ${{ env.CURRENT_PROJECT_VERSION }}
-
-      - name: Test Version
-        run: |
-          echo ${{ env.MARKETING_VERSION }}
-          echo ${{ env.CURRENT_PROJECT_VERSION }}
+          echo "CURRENT_PROJECT_VERSION=1" >> $GITHUB_ENV
 
       - name: Setup
-#TODO
-        if: env.PROJECT_BUILD != '0'
         run: |
           mkdir -p $BUILD_PATH
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
@@ -95,8 +75,6 @@ jobs:
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Resolve Dependencies
-#TODO
-        if: env.PROJECT_BUILD != '0'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           yarn install
@@ -107,8 +85,6 @@ jobs:
           ls -l ios
       
       - name: Clean
-#TODO
-        if: env.PROJECT_BUILD != '0'
         run: |
           xcodebuild -workspace ios/example.xcworkspace \
             -scheme example \
@@ -117,8 +93,6 @@ jobs:
           ls -l $BUILD_PATH
       
       - name: Archive
-#TODO
-        if: env.PROJECT_BUILD != '0'
         run: |
           xcodebuild -workspace ios/example.xcworkspace \
             -scheme "example" \
@@ -135,8 +109,6 @@ jobs:
           ls -l $BUILD_PATH
       
       - name: Export
-#TODO
-        if: env.PROJECT_BUILD != '0'
         run: |
           xcodebuild -exportArchive \
             -archivePath $BUILD_PATH/example.xcarchive \
@@ -145,8 +117,7 @@ jobs:
           ls -l $BUILD_PATH/export
       
       - name: Upload
-#TODO
-        if: env.PROJECT_BUILD != '0'
+        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
         run: |
           xcrun altool --upload-app \
             --file $BUILD_PATH/export/example.ipa \
