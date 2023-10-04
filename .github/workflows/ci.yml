@@ -57,6 +57,7 @@ jobs:
 
       - name: Resolve Dependencies
         run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           yarn install
           cd ios
           pod install
