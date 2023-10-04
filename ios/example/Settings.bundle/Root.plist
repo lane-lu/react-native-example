@@ -10,21 +10,21 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Group</string>
+			<string>Server URL</string>
+			<key>FooterText</key>
+			<string></string>
 		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>Server URL</string>
 			<key>Key</key>
 			<string>x-server-url</string>
 			<key>DefaultValue</key>
-			<string>http://</string>
+			<string>https://</string>
 			<key>IsSecure</key>
 			<false/>
 			<key>KeyboardType</key>
-			<string>Alphabet</string>
+			<string>URL</string>
 			<key>AutocapitalizationType</key>
 			<string>None</string>
 			<key>AutocorrectionType</key>

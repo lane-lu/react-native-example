@@ -6,14 +6,15 @@
  */
 
 import React from 'react';
-import { Button, Text, TextInput } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import PropertyEditor from 'react-native-property-editor';
+import {Button, Text, TextInput} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import PropertyEditor from '@interpro/react-native-property-editor';
+import {IpBarcodeScanner} from '@interpro/react-native-barcode-scanner';
 
 type RootStackParamList = {
-  'Home': undefined;
+  Home: undefined;
   'Set Server URL': undefined;
   'Get Server URL': undefined;
 };
@@ -29,7 +30,7 @@ function App(): JSX.Element {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: 'Welcome' }}
+          options={{title: 'Welcome'}}
         />
         <Stack.Screen name="Set Server URL" component={SetPropertyScreen} />
         <Stack.Screen name="Get Server URL" component={GetPropertyScreen} />
@@ -38,7 +39,7 @@ function App(): JSX.Element {
   );
 }
 
-const HomeScreen = ({ navigation }: Props) => {
+const HomeScreen = ({navigation}: Props) => {
   return (
     <>
       <Button
@@ -54,10 +55,14 @@ const HomeScreen = ({ navigation }: Props) => {
 };
 
 const SetPropertyScreen = () => {
-  const [serverURL, setServerURL] = React.useState<string | undefined>();
+  const [serverURL, setServerURL] = React.useState<string | undefined>(
+    'https://',
+  );
+
+  const scannerRef = React.useRef<IpBarcodeScanner>(null);
 
   React.useEffect(() => {
-    PropertyEditor.getString('x-server-url', 'http://www.google.com/').then(setServerURL);
+    PropertyEditor.getString('x-server-url').then(setServerURL);
   }, []);
 
   return (
@@ -65,22 +70,33 @@ const SetPropertyScreen = () => {
       <Text>Input Server URL:</Text>
       <TextInput
         placeholder="Type server URL here"
-        onChangeText={(text) => setServerURL(text)}
+        onChangeText={text => setServerURL(text)}
         defaultValue={serverURL}
+        keyboardType="url"
       />
       <Button
         title="Save"
         onPress={() => PropertyEditor.setString('x-server-url', serverURL!)}
       />
+      <Button
+        title="Scan QR Code"
+        onPress={() => scannerRef?.current?.openScanner()}
+      />
+      <IpBarcodeScanner
+        ref={scannerRef}
+        onBarcodeDetected={(data: any) => setServerURL(data)}
+      />
     </>
-  )
-}
+  );
+};
 
 const GetPropertyScreen = () => {
-  const [serverURL, setServerURL] = React.useState<string | undefined>();
+  const [serverURL, setServerURL] = React.useState<string | undefined>(
+    'https://',
+  );
 
   React.useEffect(() => {
-    PropertyEditor.getString('x-server-url', 'http://www.google.com/').then(setServerURL);
+    PropertyEditor.getString('x-server-url').then(setServerURL);
   }, []);
 
   return (
@@ -89,6 +105,6 @@ const GetPropertyScreen = () => {
       <Text>{serverURL}</Text>
     </>
   );
-}
+};
 
 export default App;
