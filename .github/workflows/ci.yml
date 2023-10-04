@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - '*'
+#TODO - 'main'
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+-build.[0-9]+'
   pull_request:
@@ -14,6 +15,9 @@ jobs:
   build-ios:
     runs-on: macos-latest
     env:
+#      MARKETING_VERSION: "1.0.0"
+#      CURRENT_PROJECT_VERSION: "0"
+#TODO
       PROJECT_VERSION: "1.0.0"
       PROJECT_BUILD: "0"
       BUILD_PATH: "ios/build/target"
@@ -35,20 +39,32 @@ jobs:
       TESTFLIGHT_PASSWORD: ${{ secrets.TESTFLIGHT_PASSWORD }}
     steps:
       - name: Check Xcode Version
-        run: xcodebuild -version
+        run: |
+          xcodebuild -version
+          MARKETING_VERSION="1.0.0"
+          CURRENT_PROJECT_VERSION="0"
+          echo ${{ env.MARKETING_VERSION }}
+          echo ${{ env.CURRENT_PROJECT_VERSION }}
 
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Check tag name
-        run: echo "BUILD_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: Test env
+      - name: Set Version Name
+        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
         run: |
-          echo $BUILD_NAME
-          echo ${{ env.BUILD_NAME }}
+          echo "GIT_REF_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          MARKETING_VERSION=$(echo $GIT_REF_NAME | awk '{sub(/.*[v]/,""); sub(/[-].*/,""); print $0}')
+          CURRENT_PROJECT_VERSION=$(echo $GIT_REF_NAME | awk '{sub(/.*[-build.]/,""); print $0}')
+          echo ${{ env.MARKETING_VERSION }}
+          echo ${{ env.CURRENT_PROJECT_VERSION }}
+
+      - name: Test Env
+        run: |
+          echo ${{ env.MARKETING_VERSION }}
+          echo ${{ env.CURRENT_PROJECT_VERSION }}
 
       - name: Setup
+#TODO
         if: env.PROJECT_BUILD != '0'
         run: |
           mkdir -p $BUILD_PATH
@@ -70,6 +86,7 @@ jobs:
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Resolve Dependencies
+#TODO
         if: env.PROJECT_BUILD != '0'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
@@ -81,6 +98,7 @@ jobs:
           ls -l ios
       
       - name: Clean
+#TODO
         if: env.PROJECT_BUILD != '0'
         run: |
           xcodebuild -workspace ios/example.xcworkspace \
@@ -90,6 +108,7 @@ jobs:
           ls -l $BUILD_PATH
       
       - name: Archive
+#TODO
         if: env.PROJECT_BUILD != '0'
         run: |
           xcodebuild -workspace ios/example.xcworkspace \
@@ -101,10 +120,13 @@ jobs:
             ONLY_ACTIVE_ARCH=NO \
             ENABLE_BITCODE=NO \
             VALID_ARCHS="arm64 arm64e armv7s" \
+            MARKETING_VERSION=${{ env.MARKETING_VERSION }} \
+            CURRENT_PROJECT_VERSION=${{ env.CURRENT_PROJECT_VERSION }} \
             archive
           ls -l $BUILD_PATH
       
       - name: Export
+#TODO
         if: env.PROJECT_BUILD != '0'
         run: |
           xcodebuild -exportArchive \
@@ -114,6 +136,7 @@ jobs:
           ls -l $BUILD_PATH/export
       
       - name: Upload
+#TODO
         if: env.PROJECT_BUILD != '0'
         run: |
           xcrun altool --upload-app \
