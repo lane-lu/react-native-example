@@ -442,6 +442,8 @@ PODS:
     - React-Core
   - react-native-camera/RN (0.1.0):
     - React-Core
+  - react-native-netinfo (11.1.0):
+    - React-Core
   - react-native-property-editor (1.0.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -557,12 +559,26 @@ PODS:
     - React-jsi (= 0.72.4)
     - React-logger (= 0.72.4)
     - React-perflogger (= 0.72.4)
+  - rn-fetch-blob (0.12.0):
+    - React-Core
+  - RNExitApp (2.0.0):
+    - React-Core
+  - RNFS (2.20.0):
+    - React-Core
   - RNScreens (3.25.0):
     - React-Core
     - React-RCTImage
   - RNSVG (13.14.0):
     - React-Core
+  - RNZipArchive (6.1.0):
+    - React-Core
+    - RNZipArchive/Core (= 6.1.0)
+    - SSZipArchive (~> 2.2)
+  - RNZipArchive/Core (6.1.0):
+    - React-Core
+    - SSZipArchive (~> 2.2)
   - SocketRocket (0.6.1)
+  - SSZipArchive (2.4.3)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -615,6 +631,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - "react-native-camera (from `../node_modules/@interpro/react-native-camera`)"
   - "react-native-camera/BarcodeDetectorMLKit (from `../node_modules/@interpro/react-native-camera`)"
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - "react-native-property-editor (from `../node_modules/@interpro/react-native-property-editor`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -634,8 +651,12 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - RNExitApp (from `../node_modules/react-native-exit-app`)
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -665,6 +686,7 @@ SPEC REPOS:
     - OpenSSL-Universal
     - PromisesObjC
     - SocketRocket
+    - SSZipArchive
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -713,6 +735,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-camera:
     :path: "../node_modules/@interpro/react-native-camera"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-property-editor:
     :path: "../node_modules/@interpro/react-native-property-editor"
   react-native-safe-area-context:
@@ -751,10 +775,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  rn-fetch-blob:
+    :path: "../node_modules/rn-fetch-blob"
+  RNExitApp:
+    :path: "../node_modules/react-native-exit-app"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNZipArchive:
+    :path: "../node_modules/react-native-zip-archive"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -805,6 +837,7 @@ SPEC CHECKSUMS:
   React-jsinspector: aaed4cf551c4a1c98092436518c2d267b13a673f
   React-logger: da1ebe05ae06eb6db4b162202faeafac4b435e77
   react-native-camera: 92393a7bc563f0477abf26d4e2c41d13f0ea9e2e
+  react-native-netinfo: 3aa5637c18834966e0c932de8ae1ae56fea20a97
   react-native-property-editor: 8eb30cb43dfaf966afab10679b2870137e2db0ac
   react-native-safe-area-context: 7aa8e6d9d0f3100a820efb1a98af68aa747f9284
   React-NativeModulesApple: edb5ace14f73f4969df6e7b1f3e41bef0012740f
@@ -824,12 +857,17 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 4941cc1b3cf08b792fbf666342c9fc95f1969035
   React-utils: b79f2411931f9d3ea5781404dcbb2fa8a837e13a
   ReactCommon: 4b2bdcb50a3543e1c2b2849ad44533686610826d
+  rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
+  RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
+  RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
+  RNZipArchive: ef9451b849c45a29509bf44e65b788829ab07801
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 2d7776c3435f026781ce61050eb3416123c13839
+PODFILE CHECKSUM: de8b83d2ac6f0003b47b83ac0b74c6cadf1e2fe4
 
 COCOAPODS: 1.12.1

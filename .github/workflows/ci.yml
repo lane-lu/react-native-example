@@ -71,6 +71,7 @@ jobs:
           security import $BUILD_PATH/$DEVELOPMENT_CERTIFICATE_NAME -P $DEVELOPMENT_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
           security import $BUILD_PATH/$DISTRIBUTION_CERTIFICATE_NAME -P $DISTRIBUTION_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
           security list-keychain -d user -s `pwd`/$BUILD_PATH/$KEYCHAIN_NAME
+          security find-identity -v -p codesigning
           ls -l $BUILD_PATH
           ls -l ~/Library/MobileDevice/Provisioning\ Profiles
 
